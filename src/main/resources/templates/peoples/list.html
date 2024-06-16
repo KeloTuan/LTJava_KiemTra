@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${title} ?: 'Kết Quả'">Kết Quả</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background: url('https://your-image-url.com/image.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* lớp phủ màu đen với độ mờ 50% */
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            color: white; /* đổi màu chữ để dễ đọc hơn trên nền tối */
+        }
+    </style>
+</head>
+<body>
+<div class="overlay"></div>
+<section layout:fragment="content" class="container mt-5 content">
+    <div>
+        <a th:href="@{/peoples/add}" class="btn btn-primary mb-3">
+            <i class="fas fa-user-plus"></i> Add New People
+        </a>
+    </div>
+    <div>
+        <form th:action="@{/peoples/search}" method="get">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by name..." class="form-control mb-3">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+    <h1>Danh Sách Nhân Viên</h1>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Mã Nhân Viên</th>
+            <th>Tên Nhân Viên</th>
+            <th>Phái</th>
+            <th>Nơi Sinh</th>
+            <th>Phòng Ban</th>
+            <th>Số Lương</th>
+            <th>Hành Động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="people : ${peoples}">
+            <td th:text="${people.maPeople}"></td>
+            <td th:text="${people.tenPeople}"></td>
+            <td>
+                <img th:src="@{${people.phai} == 'W' ? '/images/people/woman.jpg' : '/images/people/man.jpg'}" alt="Gender Image" class="img-fluid" style="max-width: 50px;">
+            </td>
+            <td th:text="${people.noiSinh}"></td>
+            <td th:text="${people.phong != null ? people.phong.tenPhong : 'N/A'}"></td>
+            <td th:text="${people.luong}"></td>
+            <td>
+                <a th:href="@{/peoples/edit/{maPeople}(maPeople=${people.maPeople})}" class="btn btn-success btn-sm">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a th:href="@{/peoples/delete/{maPeople}(maPeople=${people.maPeople})}" class="btn btn-danger btn-sm"
+                   onclick="return confirm('Are you sure?')">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="pagination">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/peoples(page=${currentPage - 1}, size=${size})}">Previous</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/peoples(page=${i}, size=${size})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/peoples(page=${currentPage + 1}, size=${size})}">Next</a>
+            </li>
+        </ul>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
